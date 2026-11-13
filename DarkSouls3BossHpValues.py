@@ -110,3 +110,18 @@ with open(filename,"a+") as f:
     f.write("\nHP Values\n")
     df.to_csv(f, header = True)
 
+
+ 
+x = np.linspace(0,len(data["Boss"]),len(data["Boss"]))
+for key in data:
+    y = []
+    if key != "Boss":
+        for i in data[key]:
+            y.append((int(i.replace(",",""))))
+        y = np.array(y)
+        slope, intercept = np.polyfit(x,y,1)
+        plt.scatter(x,y)
+        plt.plot(x,x*slope+intercept,label = key)
+plt.legend()
+plt.grid()
+plt.show()
