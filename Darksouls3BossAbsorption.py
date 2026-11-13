@@ -17,6 +17,7 @@ dlc1table = table.find_next_sibling("table")
 dlc2table = dlc1table.find_next_sibling("table")
 dlc1bosses = dlc1table.find_all("tr")
 dlc2bosses = dlc2table.find_all("tr")
+
 del dlc2bosses[3]
 data = {"Boss": [],
         "Standard" : [],
@@ -31,8 +32,11 @@ data = {"Boss": [],
 def addBosses(table):
     global url
     for i in table[1:]:
-        row = i.find_all("td")
-        link = row[0].find("a")["href"]
+        if i.find_all("td") == []:
+            link = "/Demon_Prince"
+        else:
+            row = i.find_all("td")
+            link = row[0].find("a")["href"]
         urlJoined = urljoin(url, link)
         urlResponse = requests.get(urlJoined,headers = headers)
         pageSoup = BeautifulSoup(urlResponse.content,"html.parser")
@@ -42,7 +46,7 @@ def addBosses(table):
         for i in abs:
             if i.text == "absorption":
                 del i
-            elif len(data["Boss"]) == 11 or len(data["Boss"]) == 26:
+            elif link == "/Dancer_of_the_Boreal_Valley" or len(data["Boss"]) == 27:
                 row.append(i.parent.parent)
             else:
                 row.append(i.parent.parent.parent)
@@ -85,6 +89,7 @@ def darkeaterMidir():
 
             data[key].append(midirnumber[j].text.strip("\n"))
 
+dlc2bosses.insert(2,dlc2table.find("a", href = "/Demon_Prince"))
 
 addBosses(baseGameBosses)
 addBosses(dlc1bosses)
@@ -103,7 +108,18 @@ darkeaterMidir()
 
 df = pd.DataFrame(data)
 df.index += 1
+df.index.name = "#"
+filename = "DarkSouls3BossInfo.csv"
+with open(filename,"a+") as f:
+    f.seek(0,2)
+    f.write("\nAbsorption Values\n")
+    df.to_csv(f, header = True)
 
+
+
+
+
+ 
 x = np.linspace(0,len(data["Boss"]),len(data["Boss"]))
 for key in data:
     y = []
@@ -117,8 +133,6 @@ for key in data:
 plt.legend()
 plt.grid()
 plt.show()
-
-df.to_csv("asorptionTables.csv")
 
 # for i in list.find_all("li"):
 #     link = i.find("a")
